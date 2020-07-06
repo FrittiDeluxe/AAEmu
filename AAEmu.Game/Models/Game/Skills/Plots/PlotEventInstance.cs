@@ -8,21 +8,21 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
     {
         public BaseUnit Source { get; set; }
         private BaseUnit PreviousSource { get; set; }
-        public List<BaseUnit> Targets { get; set; }
-        private List<BaseUnit> PreviousTargets { get; set; }
+        public BaseUnit Target { get; set; }
+        private BaseUnit PreviousTarget { get; set; }
+        public List<BaseUnit> AreaTargets { get; set; }
 
         public PlotEventInstance(PlotInstance instance)
         {
-            Targets = new List<BaseUnit>();
-            PreviousTargets = new List<BaseUnit> { instance.Target };
+            AreaTargets = new List<BaseUnit>();
             PreviousSource = instance.Caster;
+            PreviousTarget = instance.Target;
         }
         public PlotEventInstance(PlotEventInstance eventInstance)
         {
-            Source = eventInstance.Source;
-            Targets = new List<BaseUnit>();
-            PreviousSource = Source;
-            PreviousTargets = new List<BaseUnit>(eventInstance.Targets);
+            AreaTargets = new List<BaseUnit>();
+            PreviousSource = eventInstance.Source;
+            PreviousTarget = eventInstance.Target;
         }
 
         public void UpdateSource(PlotEventTemplate template, PlotInstance instance)
@@ -39,10 +39,7 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
                     Source = PreviousSource;
                     break;
                 case PlotSourceUpdateMethodType.PreviousTarget:
-                    //Will there be multiple targets when this is called?
-                    if (PreviousTargets.Count > 1)
-                        NLog.LogManager.GetCurrentClassLogger().Error("Multiple Previous Targets For Case PreviousTarget.");
-                    Source = PreviousTargets[0];
+                    Source = PreviousTarget;
                     break;
             }
         }
@@ -51,16 +48,16 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             switch ((PlotTargetUpdateMethodType)template.TargetUpdateMethodId)
             {
                 case PlotTargetUpdateMethodType.OriginalSource:
-                    Targets.Add(instance.Caster);
+                    Target = instance.Caster;
                     break;
                 case PlotTargetUpdateMethodType.OriginalTarget:
-                    Targets.Add(instance.Target);
+                    Target = instance.Target;
                     break;
                 case PlotTargetUpdateMethodType.PreviousSource:
-                    Targets.Add(PreviousSource);
+                    Target = PreviousSource;
                     break;
                 case PlotTargetUpdateMethodType.PreviousTarget:
-                    Targets.AddRange(PreviousTargets);
+                    Target = PreviousTarget;
                     break;
                 case PlotTargetUpdateMethodType.Area:
                     //Todo
