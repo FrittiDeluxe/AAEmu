@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using AAEmu.Game.Core.Managers.World;
 using AAEmu.Game.Models.Game.Skills.Plots.Type;
 using AAEmu.Game.Models.Game.Units;
 using AAEmu.Game.Models.Game.Skills.Plots.UpdateTargetMethods;
@@ -66,7 +68,7 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
                     EffectedTargets.Add(Target);
                     break;
                 case PlotTargetUpdateMethodType.Area:
-                    Target = UpdateAreaTarget(new PlotTargetAreaParams(template));
+                    Target = UpdateAreaTarget(new PlotTargetAreaParams(template), EffectedTargets);
                     break;
                 case PlotTargetUpdateMethodType.RandomUnit:
                     Target = UpdateRandomUnitTarget(new PlotTargetRandomUnitParams(template));
@@ -77,7 +79,7 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             }
         }
 
-        private BaseUnit UpdateAreaTarget(PlotTargetAreaParams args)
+        private BaseUnit UpdateAreaTarget(PlotTargetAreaParams args, List<BaseUnit> effectedTargets)
         {
             BaseUnit posUnit = new BaseUnit();
             posUnit.Position = Source.Position;
@@ -85,8 +87,20 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             var direction = MathUtil.ConvertDegreeToDirection(args.Angle);
             var newPos = MathUtil.AddDistanceToFront(args.Distance, posUnit.Position.X, posUnit.Position.Y, direction);
 
+            posUnit.Position.X = newPos.Item1;
+            posUnit.Position.Y = newPos.Item2;
+            // posUnit.Position.Z = get heightmap value for x:y     
+            
             //TODO: Get Targets around posUnit?
+            var unitsInRange = WorldManager.Instance.GetAround<BaseUnit>(posUnit, 5);
 
+            // TODO : Filter min distance
+            // TODO : Compute Unit Relation
+            // TODO : Compute Unit Flag
+            // unitsInRange = unitsInRange.Where(u => u.);
+            
+            effectedTargets.AddRange(unitsInRange);
+            
             return posUnit;
         }
 

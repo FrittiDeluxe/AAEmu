@@ -1,6 +1,8 @@
 using System;
 using AAEmu.Game.Core.Managers;
 using AAEmu.Game.Models.Game.Skills.Effects;
+using AAEmu.Game.Models.Game.Skills.Plots.Type;
+using AAEmu.Game.Models.Game.Units;
 
 namespace AAEmu.Game.Models.Game.Skills.Plots
 {
@@ -12,7 +14,7 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
         public uint ActualId { get; set; }
         public string ActualType { get; set; }
 
-        public void ApplyEffect(PlotInstance instance, PlotEventTemplate evt, Skill skill, ref byte flag, ref bool appliedEffects)
+        public void ApplyEffect(PlotInstance instance, PlotEventInstance eventInstance, PlotEventTemplate evt, Skill skill, ref byte flag, ref bool appliedEffects)
         {
             var template = SkillManager.Instance.GetEffectTemplate(ActualId, ActualType);
 
@@ -23,11 +25,55 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
 
             // TODO: Update Source and Target here.
             // Given how source/target update is the same for Effects and Conditions, either use a common object and update above, or extension methods
+            Unit source;
+            
+            switch (SourceId)
+            {
+                case 1:
+                    source = instance.Caster;
+                    break;
+                case 2:
+                    source = (Unit) instance.Target;
+                    break;
+                case 3:
+                    source = (Unit) eventInstance.Source;
+                    break;
+                case 4:
+                    source = (Unit) eventInstance.Target;
+                    break;
+                default:
+                    throw new InvalidOperationException("This can't happen");
+            }
+            
+            BaseUnit target;
+
+            switch (TargetId)
+            {
+                case 1:
+                    target = instance.Caster;
+                    break;
+                case 2:
+                    target = instance.Target;
+                    break;
+                case 3:
+                    target = eventInstance.Source;
+                    break;
+                case 4:
+                    target = eventInstance.Target;
+                    break;
+                case 5:
+                    target = eventInstance.Target;
+                    break;
+                default:
+                    throw new InvalidOperationException("This can't happen");
+            }
+            
+            Console.WriteLine($"Effect: {this.ActualType} Source: {source.Name} Target: {target.Name}");
             
             template.Apply(
-                instance.Caster,
+                source,
                 instance.CasterCaster,
-                instance.Target,
+                target,
                 instance.TargetCaster,
                 new CastPlot(evt.PlotId, skill.TlId, evt.Id, skill.Template.Id), skill, instance.SkillObject, DateTime.Now);
         }

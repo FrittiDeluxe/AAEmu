@@ -43,7 +43,8 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
 
         private bool СheckСonditions(PlotInstance instance)
         {
-            return Conditions.All(condition => condition.CheckCondition(instance));
+            var res = Conditions.All(condition => condition.CheckCondition(instance));
+            return true;
         }
         
         private bool HasSpecialEffects()
@@ -56,14 +57,14 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             return has;
         }
 
-        private bool ApplyEffects(PlotInstance instance, ref byte flag)
+        private bool ApplyEffects(PlotInstance instance, PlotEventInstance eventInstance, ref byte flag)
         {
             var appliedEffects = false;
             var skill = instance.ActiveSkill;
             
             foreach (var eff in Effects)
             {
-                eff.ApplyEffect(instance, this, skill, ref flag, ref appliedEffects);
+                eff.ApplyEffect(instance, eventInstance, this, skill, ref flag, ref appliedEffects);
             }
             
             return appliedEffects;
@@ -91,11 +92,14 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
                 return;
             }
 
+            eventInstance.UpdateSource(this, instance);
+            eventInstance.UpdateTargets(this, instance);
+            
             // Check Conditions
             //TODO Loop for every target in PlotEventInstance
             var pass = СheckСonditions(instance);
             if (pass)
-                ApplyEffects(instance, ref flag);
+                ApplyEffects(instance, eventInstance, ref flag);
             else
                 flag = 0;
 
