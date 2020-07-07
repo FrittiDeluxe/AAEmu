@@ -5,6 +5,7 @@ using AAEmu.Game.Models.Game.Units;
 using AAEmu.Game.Core.Packets.G2C;
 using AAEmu.Game.Models.Game.Char;
 using AAEmu.Game.Core.Managers.Id;
+using System.Diagnostics;
 
 namespace AAEmu.Game.Models.Game.Skills.Plots
 {
@@ -32,9 +33,12 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
                 }
             }
 
+            var timer = new Stopwatch();
+            timer.Start();
             NLog.LogManager.GetCurrentClassLogger().Debug($"Plot: {Id} tl: {skill.TlId} Executing.");
             await EventTemplate.PlayEvent(instance, new PlotEventInstance(instance), null);
-            NLog.LogManager.GetCurrentClassLogger().Debug($"Plot: {Id} tl: {skill.TlId} Finished.");
+            timer.Stop();
+            NLog.LogManager.GetCurrentClassLogger().Debug($"Plot: {Id} tl: {skill.TlId} Finished in {timer.ElapsedMilliseconds}ms.");
 
             if (caster is Character character2)
             {

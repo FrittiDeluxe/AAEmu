@@ -91,18 +91,26 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
         private BaseUnit UpdateAreaTarget(PlotTargetAreaParams args, PlotInstance instance)
         {
             BaseUnit posUnit = new BaseUnit();
-            posUnit.Position = new Point(Source.Position.X, Source.Position.Y, Source.Position.Z);
-            posUnit.Region = Source.Region;
-            posUnit.Position.ZoneId = Source.Position.ZoneId;
-            posUnit.Position.WorldId = Source.Position.WorldId;
-            //posUnit.Position.RotationZ = S
-            var direction = MathUtil.ConvertDegreeToDirection(args.Angle);
-            var newPos = MathUtil.AddDistanceToFront(args.Distance, posUnit.Position.X, posUnit.Position.Y, direction);
+            posUnit.Name = "Dummy";
+            posUnit.Region = PreviousTarget.Region;
+            posUnit.Position = new Point();
+            posUnit.Position.ZoneId = PreviousTarget.Position.ZoneId;
+            posUnit.Position.WorldId = PreviousTarget.Position.WorldId;
 
-            posUnit.Position.X = newPos.Item1;
-            posUnit.Position.Y = newPos.Item2;
-            // posUnit.Position.Z = get heightmap value for x:y   
-            
+            //TODO Optimize rotation calc 
+            var rotZ = MathUtil.ConvertDegreeToDirection(args.Angle + MathUtil.ConvertDirectionToDegree(PreviousTarget.Position.RotationZ));
+            float x, y;
+            if (args.Distance > 0)
+                (x, y) = MathUtil.AddDistanceToFront(args.Distance / 1000, PreviousTarget.Position.X, PreviousTarget.Position.Y, rotZ);
+            else
+                (x, y) = (PreviousTarget.Position.X, PreviousTarget.Position.Y);
+
+            posUnit.Position.X = x;
+            posUnit.Position.Y = y;
+            posUnit.Position.Z = PreviousTarget.Position.Z;
+            posUnit.Position.RotationZ = rotZ;
+            // TODO use heightmap for Z coord 
+
             if (args.MaxTargets == 0)
             {
                 EffectedTargets.Add(posUnit);
@@ -111,7 +119,7 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             
             // posUnit.Position.Z = get heightmap value for x:y     
             //TODO: Get Targets around posUnit?
-            var unitsInRange = WorldManager.Instance.GetAround<BaseUnit>(posUnit, 5);
+            var unitsInRange = FilterTargets(WorldManager.Instance.GetAround<Unit>(posUnit, 5), instance);
 
             // TODO : Filter min distance
             // TODO : Compute Unit Relation
