@@ -98,7 +98,10 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             posUnit.Position.WorldId = PreviousTarget.Position.WorldId;
 
             //TODO Optimize rotation calc 
-            var rotZ = MathUtil.ConvertDegreeToDirection(args.Angle + MathUtil.ConvertDirectionToDegree(PreviousTarget.Position.RotationZ));
+            var rotZ = PreviousTarget.Position.RotationZ;
+            if (args.Angle != 0)
+                rotZ = MathUtil.ConvertDegreeToDirection(args.Angle + MathUtil.ConvertDirectionToDegree(PreviousTarget.Position.RotationZ));
+
             float x, y;
             if (args.Distance > 0)
                 (x, y) = MathUtil.AddDistanceToFront(args.Distance / 1000, PreviousTarget.Position.X, PreviousTarget.Position.Y, rotZ);
@@ -110,7 +113,7 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             posUnit.Position.Z = PreviousTarget.Position.Z;
             posUnit.Position.RotationZ = rotZ;
             // TODO use heightmap for Z coord 
-
+            
             if (args.MaxTargets == 0)
             {
                 EffectedTargets.Add(posUnit);
