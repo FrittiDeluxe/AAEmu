@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using AAEmu.Commons.Utils;
 using AAEmu.Game.Core.Managers.World;
 using AAEmu.Game.Models.Game.Skills.Plots.Type;
 using AAEmu.Game.Models.Game.Units;
@@ -109,8 +110,10 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
         private BaseUnit UpdateRandomUnitTarget(PlotTargetRandomUnitParams args)
         {
             //TODO for now we get all units in a 5 meters radius
-            var randomUnit = WorldManager.Instance.GetAround<BaseUnit>(Source, 5).FirstOrDefault();
-
+            var randomUnits = WorldManager.Instance.GetAround<BaseUnit>(Source, 5);
+            
+            var randomUnit = randomUnits[Rand.Next(0, randomUnits.Count)];
+            
             return randomUnit;
         }
 
