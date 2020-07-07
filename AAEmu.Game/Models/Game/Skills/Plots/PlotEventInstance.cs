@@ -96,11 +96,13 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             posUnit.Position.ZoneId = Source.Position.ZoneId;
             posUnit.Position.WorldId = Source.Position.WorldId;
             //posUnit.Position.RotationZ = S
-            var direction = MathUtil.ConvertDegreeToDirection(args.Angle);
-            var newPos = MathUtil.AddDistanceToFront(args.Distance, posUnit.Position.X, posUnit.Position.Y, direction);
+            var rotZ = Source.Position.RotationZ;
+            if (args.Angle != 0)
+                rotZ = MathUtil.ConvertDegreeToDirection(args.Angle + MathUtil.ConvertDirectionToDegree(rotZ));
+            var (x, y) = MathUtil.AddDistanceToFront(args.Distance, posUnit.Position.X, posUnit.Position.Y, rotZ);
 
-            posUnit.Position.X = newPos.Item1;
-            posUnit.Position.Y = newPos.Item2;
+            posUnit.Position.X = x;
+            posUnit.Position.Y = y;
             // posUnit.Position.Z = get heightmap value for x:y   
             
             if (args.MaxTargets == 0)
