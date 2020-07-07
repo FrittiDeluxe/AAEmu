@@ -113,10 +113,9 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             var randomUnits = WorldManager.Instance.GetAround<Unit>(Source, 5);
 
             var filteredUnits = FilterTargets(randomUnits, instance);
+            var index = Rand.Next(0, randomUnits.Count);
+            var randomUnit = filteredUnits.ElementAt(index);
 
-            //Can we select by index without ToArray?
-            var randomUnit = filteredUnits.ToArray()[Rand.Next(0, randomUnits.Count)];
-            
             return randomUnit;
         }
 
@@ -129,10 +128,10 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             return posUnit;
         }
 
-        private IEnumerable<Unit> FilterTargets(List<Unit> Units, PlotInstance instance)
+        private IEnumerable<Unit> FilterTargets(IEnumerable<Unit> units, PlotInstance instance)
         {
             var template = instance.ActiveSkill.Template;
-            IEnumerable<Unit> filtered = Units;
+            var filtered = units;
             if (!template.TargetAlive)
                 filtered = filtered.Where(o => o.Hp == 0);
             if (!template.TargetDead)
