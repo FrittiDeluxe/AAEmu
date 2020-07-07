@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AAEmu.Commons.Utils;
 using AAEmu.Game.Core.Managers.World;
+using AAEmu.Game.Models.Game.Faction;
 using AAEmu.Game.Models.Game.Skills.Plots.Type;
 using AAEmu.Game.Models.Game.Units;
 using AAEmu.Game.Models.Game.Skills.Plots.UpdateTargetMethods;
@@ -24,6 +26,7 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             PreviousSource = instance.Caster;
             PreviousTarget = instance.Target;
         }
+
         public PlotEventInstance(PlotEventInstance eventInstance)
         {
             EffectedTargets = new List<BaseUnit>();
@@ -51,6 +54,7 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
                     break;
             }
         }
+
         public void UpdateTargets(PlotEventTemplate template, PlotInstance instance)
         {
             switch ((PlotTargetUpdateMethodType)template.TargetUpdateMethodId)
@@ -105,6 +109,7 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
                 return posUnit;
             }
             
+            // posUnit.Position.Z = get heightmap value for x:y     
             //TODO: Get Targets around posUnit?
             var unitsInRange = WorldManager.Instance.GetAround<BaseUnit>(posUnit, 5);
 
@@ -112,9 +117,9 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             // TODO : Compute Unit Relation
             // TODO : Compute Unit Flag
             // unitsInRange = unitsInRange.Where(u => u.);
-            
+
             EffectedTargets.AddRange(unitsInRange);
-            
+
             return posUnit;
         }
 
@@ -124,10 +129,9 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             var randomUnits = WorldManager.Instance.GetAround<Unit>(Source, 5);
 
             var filteredUnits = FilterTargets(randomUnits, instance);
+            var index = Rand.Next(0, randomUnits.Count);
+            var randomUnit = filteredUnits.ElementAt(index);
 
-            //Can we select by index without ToArray?
-            var randomUnit = filteredUnits.ToArray()[Rand.Next(0, randomUnits.Count)];
-            
             return randomUnit;
         }
 
@@ -140,17 +144,38 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             return posUnit;
         }
 
-        private IEnumerable<Unit> FilterTargets(List<Unit> Units, PlotInstance instance)
+        private IEnumerable<Unit> FilterTargets(IEnumerable<Unit> units, PlotInstance instance)
         {
             var template = instance.ActiveSkill.Template;
-            IEnumerable<Unit> filtered = Units;
+            var filtered = units;
             if (!template.TargetAlive)
                 filtered = filtered.Where(o => o.Hp == 0);
             if (!template.TargetDead)
                 filtered = filtered.Where(o => o.Hp > 0);
             
-
-            //Todo target relation
+            filtered = filtered
+                .Where(o =>
+                {
+                    var relationState = instance.Caster.Faction.GetRelationState(o.Faction.Id);
+                    if (relationState == RelationState.Neutral) // TODO ?
+                        return false;
+                    
+                    switch (template.TargetRelation)
+                    {
+                        case SkillTargetRelation.Any:
+                            return true;
+                        case SkillTargetRelation.Friendly:
+                            return relationState == RelationState.Friendly;
+                        case SkillTargetRelation.Party:
+                            return false; // TODO filter party member
+                        case SkillTargetRelation.Raid:
+                            return false; // TODO filter raid member
+                        case SkillTargetRelation.Hostile:
+                            return relationState == RelationState.Hostile;
+                        default:
+                            return true;
+                    }
+                });
 
             //Todo target unit type
 
