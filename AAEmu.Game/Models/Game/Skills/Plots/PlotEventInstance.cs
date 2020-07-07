@@ -71,18 +71,18 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
                     EffectedTargets.Add(Target);
                     break;
                 case PlotTargetUpdateMethodType.Area:
-                    Target = UpdateAreaTarget(new PlotTargetAreaParams(template), EffectedTargets);
+                    Target = UpdateAreaTarget(new PlotTargetAreaParams(template), instance);
                     break;
                 case PlotTargetUpdateMethodType.RandomUnit:
-                    Target = UpdateRandomUnitTarget(new PlotTargetRandomUnitParams(template));
+                    Target = UpdateRandomUnitTarget(new PlotTargetRandomUnitParams(template), instance);
                     break;
                 case PlotTargetUpdateMethodType.RandomArea:
-                    Target = UpdateRandomAreaTarget(new PlotTargetRandomAreaParams(template));
+                    Target = UpdateRandomAreaTarget(new PlotTargetRandomAreaParams(template), instance);
                     break;
             }
         }
 
-        private BaseUnit UpdateAreaTarget(PlotTargetAreaParams args, List<BaseUnit> effectedTargets)
+        private BaseUnit UpdateAreaTarget(PlotTargetAreaParams args, PlotInstance instance)
         {
             BaseUnit posUnit = new BaseUnit();
             posUnit.Position = Source.Position;
@@ -102,28 +102,48 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             // TODO : Compute Unit Flag
             // unitsInRange = unitsInRange.Where(u => u.);
             
-            effectedTargets.AddRange(unitsInRange);
+            EffectedTargets.AddRange(unitsInRange);
             
             return posUnit;
         }
 
-        private BaseUnit UpdateRandomUnitTarget(PlotTargetRandomUnitParams args)
+        private BaseUnit UpdateRandomUnitTarget(PlotTargetRandomUnitParams args, PlotInstance instance)
         {
             //TODO for now we get all units in a 5 meters radius
-            var randomUnits = WorldManager.Instance.GetAround<BaseUnit>(Source, 5);
-            
-            var randomUnit = randomUnits[Rand.Next(0, randomUnits.Count)];
+            var randomUnits = WorldManager.Instance.GetAround<Unit>(Source, 5);
+
+            var filteredUnits = FilterTargets(randomUnits, instance);
+
+            //Can we select by index without ToArray?
+            var randomUnit = filteredUnits.ToArray()[Rand.Next(0, randomUnits.Count)];
             
             return randomUnit;
         }
 
-        private BaseUnit UpdateRandomAreaTarget(PlotTargetRandomAreaParams args)
+        private BaseUnit UpdateRandomAreaTarget(PlotTargetRandomAreaParams args, PlotInstance instance)
         {
             BaseUnit posUnit = new BaseUnit();
 
             //TODO
 
             return posUnit;
+        }
+
+        private IEnumerable<Unit> FilterTargets(List<Unit> Units, PlotInstance instance)
+        {
+            var template = instance.ActiveSkill.Template;
+            IEnumerable<Unit> filtered = Units;
+            if (!template.TargetAlive)
+                filtered = filtered.Where(o => o.Hp == 0);
+            if (!template.TargetDead)
+                filtered = filtered.Where(o => o.Hp > 0);
+            
+
+            //Todo target relation
+
+            //Todo target unit type
+
+            return filtered;
         }
     }
 }
