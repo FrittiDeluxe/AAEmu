@@ -164,10 +164,21 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
         }
         
         private static bool ConditionInstrumentType(Unit caster, SkillCaster casterCaster, BaseUnit target,
-            SkillCastTarget targetCaster, SkillObject skillObject, int unk1, int unk2, int unk3)
+            SkillCastTarget targetCaster, SkillObject skillObject, int instrumentTypeId, int unk2, int unk3)
         {
             // Param1 is either 21, 22 or 23
-            return true;
+            if (caster is Character character)
+            {
+                var item = character.Inventory.Equipment.GetItemBySlot((int)EquipmentItemSlot.Musical);
+                if (item == null)
+                    return false;
+                if (item.Template is WeaponTemplate template)
+                {
+                    if (instrumentTypeId == template.HoldableTemplate.SlotTypeId)
+                        return true;
+                }
+            }
+            return false;
         }
         
         private static bool ConditionRange(Unit caster, SkillCaster casterCaster, BaseUnit target,
