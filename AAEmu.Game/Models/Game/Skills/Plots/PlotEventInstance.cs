@@ -6,6 +6,7 @@ using AAEmu.Game.Models.Game.Skills.Plots.Type;
 using AAEmu.Game.Models.Game.Units;
 using AAEmu.Game.Models.Game.Skills.Plots.UpdateTargetMethods;
 using AAEmu.Game.Utils;
+using AAEmu.Game.Models.Game.World;
 
 namespace AAEmu.Game.Models.Game.Skills.Plots
 {
@@ -75,6 +76,7 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
                     break;
                 case PlotTargetUpdateMethodType.RandomUnit:
                     Target = UpdateRandomUnitTarget(new PlotTargetRandomUnitParams(template), instance);
+                    EffectedTargets.Add(Target);
                     break;
                 case PlotTargetUpdateMethodType.RandomArea:
                     Target = UpdateRandomAreaTarget(new PlotTargetRandomAreaParams(template), instance);
@@ -85,14 +87,23 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
         private BaseUnit UpdateAreaTarget(PlotTargetAreaParams args, PlotInstance instance)
         {
             BaseUnit posUnit = new BaseUnit();
-            posUnit.Position = Source.Position;
+            posUnit.Position = new Point(Source.Position.X, Source.Position.Y, Source.Position.Z);
+            posUnit.Region = Source.Region;
+            posUnit.Position.ZoneId = Source.Position.ZoneId;
+            posUnit.Position.WorldId = Source.Position.WorldId;
             //posUnit.Position.RotationZ = S
             var direction = MathUtil.ConvertDegreeToDirection(args.Angle);
             var newPos = MathUtil.AddDistanceToFront(args.Distance, posUnit.Position.X, posUnit.Position.Y, direction);
 
             posUnit.Position.X = newPos.Item1;
             posUnit.Position.Y = newPos.Item2;
-            // posUnit.Position.Z = get heightmap value for x:y     
+            // posUnit.Position.Z = get heightmap value for x:y   
+            
+            if (args.MaxTargets == 0)
+            {
+                EffectedTargets.Add(posUnit);
+                return posUnit;
+            }
             
             //TODO: Get Targets around posUnit?
             var unitsInRange = WorldManager.Instance.GetAround<BaseUnit>(posUnit, 5);

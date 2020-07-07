@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using AAEmu.Game.Core.Managers;
 using AAEmu.Game.Models.Game.Skills.Effects;
 using AAEmu.Game.Models.Game.Skills.Plots.Type;
@@ -45,37 +45,40 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
                     throw new InvalidOperationException("This can't happen");
             }
             
-            BaseUnit target;
-
-            switch (TargetId)
+            
+            foreach (var newTarget in eventInstance.EffectedTargets)
             {
-                case 1:
-                    target = instance.Caster;
-                    break;
-                case 2:
-                    target = instance.Target;
-                    break;
-                case 3:
-                    target = eventInstance.Source;
-                    break;
-                case 4:
-                    target = eventInstance.Target;
-                    break;
-                case 5:
-                    target = eventInstance.Target;
-                    break;
-                default:
-                    throw new InvalidOperationException("This can't happen");
+                BaseUnit target;
+                switch (TargetId)
+                {
+                    case 1:
+                        target = instance.Caster;
+                        break;
+                    case 2:
+                        target = instance.Target;
+                        break;
+                    case 3:
+                        target = eventInstance.Source;
+                        break;
+                    case 4:
+                        target = newTarget;
+                        break;
+                    case 5:
+                        target = eventInstance.Target;
+                        break;
+                    default:
+                        throw new InvalidOperationException("This can't happen");
+                }
+
+                Console.WriteLine($"Effect: {this.ActualType} Source: {source.Name} Target: {target.Name}");
+
+                template.Apply(
+                    source,
+                    instance.CasterCaster,
+                    target,
+                    instance.TargetCaster,
+                    new CastPlot(evt.PlotId, skill.TlId, evt.Id, skill.Template.Id), skill, instance.SkillObject, DateTime.Now);
             }
-            
-            Console.WriteLine($"Effect: {this.ActualType} Source: {source.Name} Target: {target.Name}");
-            
-            template.Apply(
-                source,
-                instance.CasterCaster,
-                target,
-                instance.TargetCaster,
-                new CastPlot(evt.PlotId, skill.TlId, evt.Id, skill.Template.Id), skill, instance.SkillObject, DateTime.Now);
         }
     }
 }
