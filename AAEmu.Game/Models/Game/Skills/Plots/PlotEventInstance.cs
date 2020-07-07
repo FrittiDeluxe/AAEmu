@@ -27,6 +27,8 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             EffectedTargets = new List<BaseUnit>();
             PreviousSource = eventInstance.Source;
             PreviousTarget = eventInstance.Target;
+            Source = eventInstance.Source;
+            Target = eventInstance.Target;
         }
 
         public void UpdateSource(PlotEventTemplate template, PlotInstance instance)
@@ -106,9 +108,8 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
 
         private BaseUnit UpdateRandomUnitTarget(PlotTargetRandomUnitParams args)
         {
-            BaseUnit randomUnit = new BaseUnit();
-
-            //TODO
+            //TODO for now we get all units in a 5 meters radius
+            var randomUnit = WorldManager.Instance.GetAround<BaseUnit>(Source, 5).FirstOrDefault();
 
             return randomUnit;
         }

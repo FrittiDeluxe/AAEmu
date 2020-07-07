@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AAEmu.Game.Core.Managers;
@@ -62,7 +62,7 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             BaseUnit target, IEnumerable<PlotEventEffect> effects)
         {
             var animTime = GetAnimDelay(effects);
-            var projectileTime = GetProjectileDelay(caster, target);
+            var projectileTime = GetProjectileDelay(eventInstance.Source, eventInstance.Target);
             var delay = animTime + projectileTime;
             if (Casting)
                 delay += (int)instance.Caster.ApplySkillModifiers(instance.ActiveSkill, Static.SkillAttribute.CastTime,

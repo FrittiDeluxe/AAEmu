@@ -112,11 +112,9 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             {
                 var skill = instance.ActiveSkill;
                 var unkId = ((cNext?.Casting ?? false) || (cNext?.Channeling ?? false)) ? instance.Caster.ObjId : 0;
-                var casterPlotObj = new PlotObject(instance.Caster);
-                var targetPlotObj = new PlotObject(instance.Target);
-                instance.Caster.BroadcastPacket(
-                    new SCPlotEventPacket(skill.TlId, Id, skill.Template.Id, casterPlotObj, targetPlotObj, unkId,
-                        (ushort)castTime, flag), true);
+                var casterPlotObj = new PlotObject(eventInstance.Source);
+                var targetPlotObj = new PlotObject(eventInstance.Target);
+                instance.Caster.BroadcastPacket(new SCPlotEventPacket(skill.TlId, Id, skill.Template.Id, casterPlotObj, targetPlotObj, unkId, (ushort)castTime, flag), true);
             }
 
             var tasks = NextEvents

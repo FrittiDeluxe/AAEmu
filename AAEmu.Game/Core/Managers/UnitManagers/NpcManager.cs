@@ -55,6 +55,7 @@ namespace AAEmu.Game.Core.Managers.UnitManagers
             npc.Faction = FactionManager.Instance.GetFaction(template.FactionId);
             npc.Level = template.Level;
             npc.Patrol = null;
+            npc.Name = template.Name;
 
             SetEquipItemTemplate(npc, template.Items.Headgear, EquipmentItemSlot.Head);
             SetEquipItemTemplate(npc, template.Items.Necklace, EquipmentItemSlot.Neck);
@@ -129,7 +130,7 @@ namespace AAEmu.Game.Core.Managers.UnitManagers
                         {
                             var template = new NpcTemplate();
                             template.Id = reader.GetUInt32("id");
-                            template.Name = reader.GetString("name");
+                            template.Name = LocalizationManager.Instance.Get("npcs", "name", template.Id, reader.GetString("name"));
                             template.CharRaceId = reader.GetInt32("char_race_id");
                             template.NpcGradeId = (NpcGradeType)reader.GetByte("npc_grade_id");
                             template.NpcKindId = (NpcKindType)reader.GetByte("npc_kind_id");
