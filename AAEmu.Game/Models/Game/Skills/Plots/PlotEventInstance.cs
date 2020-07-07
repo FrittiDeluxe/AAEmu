@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AAEmu.Commons.Utils;
 using AAEmu.Game.Core.Managers.World;
+using AAEmu.Game.Models.Game.Faction;
 using AAEmu.Game.Models.Game.Skills.Plots.Type;
 using AAEmu.Game.Models.Game.Units;
 using AAEmu.Game.Models.Game.Skills.Plots.UpdateTargetMethods;
@@ -23,6 +25,7 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             PreviousSource = instance.Caster;
             PreviousTarget = instance.Target;
         }
+
         public PlotEventInstance(PlotEventInstance eventInstance)
         {
             EffectedTargets = new List<BaseUnit>();
@@ -50,6 +53,7 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
                     break;
             }
         }
+
         public void UpdateTargets(PlotEventTemplate template, PlotInstance instance)
         {
             switch ((PlotTargetUpdateMethodType)template.TargetUpdateMethodId)
@@ -93,7 +97,7 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             posUnit.Position.X = newPos.Item1;
             posUnit.Position.Y = newPos.Item2;
             // posUnit.Position.Z = get heightmap value for x:y     
-            
+
             //TODO: Get Targets around posUnit?
             var unitsInRange = WorldManager.Instance.GetAround<BaseUnit>(posUnit, 5);
 
@@ -101,9 +105,9 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             // TODO : Compute Unit Relation
             // TODO : Compute Unit Flag
             // unitsInRange = unitsInRange.Where(u => u.);
-            
+
             EffectedTargets.AddRange(unitsInRange);
-            
+
             return posUnit;
         }
 
@@ -137,8 +141,29 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             if (!template.TargetDead)
                 filtered = filtered.Where(o => o.Hp > 0);
             
-
-            //Todo target relation
+            filtered = filtered
+                .Where(o =>
+                {
+                    var relationState = instance.Caster.Faction.GetRelationState(o.Faction.Id);
+                    if (relationState == RelationState.Neutral) // TODO ?
+                        return false;
+                    
+                    switch (template.TargetRelation)
+                    {
+                        case SkillTargetRelation.Any:
+                            return true;
+                        case SkillTargetRelation.Friendly:
+                            return relationState == RelationState.Friendly;
+                        case SkillTargetRelation.Party:
+                            return false; // TODO filter party member
+                        case SkillTargetRelation.Raid:
+                            return false; // TODO filter raid member
+                        case SkillTargetRelation.Hostile:
+                            return relationState == RelationState.Hostile;
+                        default:
+                            return true;
+                    }
+                });
 
             //Todo target unit type
 
