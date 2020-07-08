@@ -42,13 +42,13 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
         }
 
 
-        private bool СheckСonditions(PlotInstance instance)
+        private bool СheckСonditions(PlotInstance instance, PlotEventInstance eventInstance)
         {
             if (Conditions.Count == 0)
                 return true;
             return Conditions
                 .AsParallel()
-                .All(condition => condition.CheckCondition(instance));
+                .All(condition => condition.CheckCondition(instance, eventInstance));
         }
 
         private bool HasSpecialEffects()
@@ -102,7 +102,7 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             
             // Check Conditions
             //TODO Loop for every target in PlotEventInstance
-            var pass = СheckСonditions(instance);
+            var pass = СheckСonditions(instance, eventInstance);
             
             if (pass)
                 ApplyEffects(instance, eventInstance, ref flag);

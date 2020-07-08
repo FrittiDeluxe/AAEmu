@@ -23,10 +23,7 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             if (template is SpecialEffect)
                 appliedEffects = true;
 
-            // TODO: Update Source and Target here.
-            // Given how source/target update is the same for Effects and Conditions, either use a common object and update above, or extension methods
             Unit source;
-            
             switch (SourceId)
             {
                 case PlotEffectSource.OriginalSource:
@@ -44,7 +41,6 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
                 default:
                     throw new InvalidOperationException("This can't happen");
             }
-            
             
             foreach (var newTarget in eventInstance.EffectedTargets)
             {
@@ -69,8 +65,6 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
                     default:
                         throw new InvalidOperationException("This can't happen");
                 }
-
-                Console.WriteLine($"Effect: {this.ActualType} Source: {source.Name} Target: {target.Name}");
 
                 template.Apply(
                     source,

@@ -156,8 +156,8 @@ namespace AAEmu.Game.Core.Managers
                             var template = new PlotEventCondition();
                             template.Condition = _conditions[condId];
                             template.Position = reader.GetInt32("position");
-                            template.SourceId = reader.GetInt32("source_id");
-                            template.TargetId = reader.GetInt32("target_id");
+                            template.SourceId = (PlotEffectSource) reader.GetInt32("source_id");
+                            template.TargetId = (PlotEffectTarget) reader.GetInt32("target_id");
                             template.NotifyFailure = reader.GetBoolean("notify_failure", true);
                             // TODO 1.2 // template.NotifyFailure = reader.GetBoolean("notify_failure", true);
                             var plotEvent = _eventTemplates[id];

@@ -4,6 +4,7 @@ using AAEmu.Game.Core.Managers;
 using AAEmu.Game.Models.Game.Char;
 using AAEmu.Game.Models.Game.Items;
 using AAEmu.Game.Models.Game.Items.Templates;
+using AAEmu.Game.Models.Game.Skills.Plots.Type;
 using AAEmu.Game.Models.Game.Units;
 using AAEmu.Game.Utils;
 using NLog;
@@ -108,9 +109,9 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             SkillCastTarget targetCaster, SkillObject skillObject, int unk1, int unk2, int unk3, PlotEventCondition eventCondition)
         {
             //TODO we need to calculate if unit facing us or not.
-            if (eventCondition.TargetId == 3)
+            if (eventCondition.TargetId == PlotEffectTarget.Source)
                 return false;
-            else if (eventCondition.TargetId == 4)
+            else if (eventCondition.TargetId == PlotEffectTarget.Target)
                 return true;//Always backstab?
             
             //default?
@@ -120,11 +121,10 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
         private static bool ConditionBuffTag(Unit caster, SkillCaster casterCaster, BaseUnit target,
             SkillCastTarget targetCaster, SkillObject skillObject, int tagId, int unk2, int unk3, PlotEventCondition eventCondition)
         {
-            //Todo create enum for SrcId and TargetId
-            if (eventCondition.TargetId == 3)
-                return caster.Effects.CheckBuffs(SkillManager.Instance.GetBuffsByTagId((uint)tagId));
-            else if (eventCondition.TargetId == 4)
-                return target.Effects.CheckBuffs(SkillManager.Instance.GetBuffsByTagId((uint)tagId));
+            // if (eventCondition.TargetId == PlotEffectTarget.Source)
+            //     return caster.Effects.CheckBuffs(SkillManager.Instance.GetBuffsByTagId((uint)tagId));
+            // else if (eventCondition.TargetId == PlotEffectTarget.Target)
+            //     return target.Effects.CheckBuffs(SkillManager.Instance.GetBuffsByTagId((uint)tagId));
             return target.Effects.CheckBuffs(SkillManager.Instance.GetBuffsByTagId((uint)tagId));
         }
 
