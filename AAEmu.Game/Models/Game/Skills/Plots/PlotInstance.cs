@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using AAEmu.Game.Models.Game.Units;
+using AAEmu.Game.Models.Game.World;
 
 namespace AAEmu.Game.Models.Game.Skills.Plots
 {
@@ -30,6 +31,8 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
         public readonly object ConditionLock = new object();
         public readonly object TicketLock = new object();
 
+        public List<GameObject> HitObjects { get; set; }
+
         public PlotInstance(Unit caster, SkillCaster casterCaster, BaseUnit target, SkillCastTarget targetCaster, SkillObject skillObject, Skill skill, CancellationToken ct)
         {
             Tasks = new ConcurrentBag<Task>();
@@ -45,6 +48,7 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             SkillObject = skillObject;
 
             ActiveSkill = skill;
+            HitObjects = new List<GameObject>();
         }
         public bool UseConditionCache(PlotCondition condition)
         {

@@ -352,18 +352,15 @@ namespace AAEmu.Game.Models.Game.Skills
             if (Template.EffectDelay > 0)
             {
                 var totalDelay = Template.EffectDelay;
-                if (Template.MatchAnimation) totalDelay += Template.FireAnim.Duration;
-                else if (Template.UseAnimTime) totalDelay += Template.FireAnim.CombatSyncTime;
+                if (Template.UseAnimTime) totalDelay += Template.FireAnim.CombatSyncTime;
                 TaskManager.Instance.Schedule(new ApplySkillTask(this, caster, casterCaster, target, targetCaster, skillObject), TimeSpan.FromMilliseconds(totalDelay));
             }
             else
             {
                 var totalDelay = 0;
-                if ((Template.MatchAnimation || Template.UseAnimTime) && Template.FireAnim != null)
+                if (Template.UseAnimTime && Template.FireAnim != null)
                 {
-                    if (Template.UseAnimTime) totalDelay += Template.FireAnim.CombatSyncTime;
-                    //if (Template.MatchAnimation) totalDelay += Template.FireAnim.CombatSyncTime;
-                    //if (Template.UseAnimTime) totalDelay += Template.FireAnim.Duration;
+                    totalDelay += Template.FireAnim.CombatSyncTime;
                     TaskManager.Instance.Schedule(new ApplySkillTask(this, caster, casterCaster, target, targetCaster, skillObject), TimeSpan.FromMilliseconds(totalDelay));
                 }
                 else Apply(caster, casterCaster, target, targetCaster, skillObject);

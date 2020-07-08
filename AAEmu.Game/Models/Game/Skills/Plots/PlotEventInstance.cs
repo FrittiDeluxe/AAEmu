@@ -122,7 +122,7 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             
             // posUnit.Position.Z = get heightmap value for x:y     
             //TODO: Get Targets around posUnit?
-            var unitsInRange = FilterTargets(WorldManager.Instance.GetAround<Unit>(posUnit, 5), instance);
+            var unitsInRange = FilterTargets(WorldManager.Instance.GetAround<Unit>(posUnit, 5), instance, args.HitOnce);
 
             // TODO : Filter min distance
             // TODO : Compute Unit Relation
@@ -130,6 +130,7 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             // unitsInRange = unitsInRange.Where(u => u.);
 
             EffectedTargets.AddRange(unitsInRange);
+            instance.HitObjects.AddRange(unitsInRange);
 
             return posUnit;
         }
@@ -139,7 +140,7 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             //TODO for now we get all units in a 5 meters radius
             var randomUnits = WorldManager.Instance.GetAround<Unit>(Source, 5);
 
-            var filteredUnits = FilterTargets(randomUnits, instance);
+            var filteredUnits = FilterTargets(randomUnits, instance, args.HitOnce);
             var index = Rand.Next(0, randomUnits.Count);
             var randomUnit = filteredUnits.ElementAt(index);
 
@@ -155,7 +156,7 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             return posUnit;
         }
 
-        private IEnumerable<Unit> FilterTargets(IEnumerable<Unit> units, PlotInstance instance)
+        private IEnumerable<Unit> FilterTargets(IEnumerable<Unit> units, PlotInstance instance, bool hitOnce)
         {
             var template = instance.ActiveSkill.Template;
             var filtered = units;
@@ -163,6 +164,8 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
                 filtered = filtered.Where(o => o.Hp == 0);
             if (!template.TargetDead)
                 filtered = filtered.Where(o => o.Hp > 0);
+            if (hitOnce)
+                filtered = filtered.Where(o => !instance.HitObjects.Contains(o));
             
             filtered = filtered
                 .Where(o =>
