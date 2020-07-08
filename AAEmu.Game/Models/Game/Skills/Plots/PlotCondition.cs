@@ -1,4 +1,5 @@
-﻿using AAEmu.Commons.Utils;
+﻿using System;
+using AAEmu.Commons.Utils;
 using AAEmu.Game.Core.Managers;
 using AAEmu.Game.Models.Game.Char;
 using AAEmu.Game.Models.Game.Items;
@@ -188,6 +189,7 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             // Param2 = Max range
             var range = MathUtil.CalculateDistance(caster.Position, target.Position);
             range -= 2;//Temp fix because the calculation is off
+            range = Math.Max(0f, range);
             return range >= minRange && range <= maxRange;
         }
         

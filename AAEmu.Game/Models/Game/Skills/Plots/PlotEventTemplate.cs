@@ -53,6 +53,8 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
 
         private bool HasSpecialEffects()
         {
+            if (Effects.Count == 0)
+                return false;
             return Effects
                 .Select(eff => SkillManager.Instance.GetEffectTemplate(eff.ActualId, eff.ActualType))
                 .OfType<SpecialEffect>()
@@ -76,7 +78,6 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
         {
             var timer = new Stopwatch();
             timer.Start();
-            NLog.LogManager.GetCurrentClassLogger().Debug($"PlotEvent: {Id} executing.");
             byte flag = 2;
 
             if ((instance.Ct.IsCancellationRequested && (cNext?.Casting ?? false)) || instance.Canceled)
@@ -96,29 +97,17 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
                 return;
             }
             
-            var timerUpdates = new Stopwatch();
-            timerUpdates.Start();
             eventInstance.UpdateSource(this, instance);
             eventInstance.UpdateTargets(this, instance);
-            timerUpdates.Stop();
-            NLog.LogManager.GetCurrentClassLogger().Debug($"PlotEvent: {Id} targeting update took {timerUpdates.ElapsedMilliseconds}ms.");
             
             // Check Conditions
             //TODO Loop for every target in PlotEventInstance
-            var timerConditions = new Stopwatch();
-            timerConditions.Start();
             var pass = СheckСonditions(instance);
-            timerConditions.Stop();
-            NLog.LogManager.GetCurrentClassLogger().Debug($"PlotEvent: {Id} conditions took {timerConditions.ElapsedMilliseconds}ms.");
             
-            var timerEffects = new Stopwatch();
-            timerEffects.Start();
             if (pass)
                 ApplyEffects(instance, eventInstance, ref flag);
             else
                 flag = 0;
-            timerEffects.Stop();
-            NLog.LogManager.GetCurrentClassLogger().Debug($"PlotEvent: {Id} effects took {timerEffects.ElapsedMilliseconds}ms.");
 
             double castTime = NextEvents
                 .Where(nextEvent => nextEvent.Casting && (pass ^ nextEvent.Fail))
@@ -134,7 +123,7 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
 
                 //Todo Check this a safer way
                 PlotObject targetPlotObj;
-                if (eventInstance.Target.Name == "Dummy")
+                if (eventInstance.Target.ObjId == uint.MaxValue)
                     targetPlotObj = new PlotObject(eventInstance.Target.Position);
                 else
                     targetPlotObj = new PlotObject(eventInstance.Target);
@@ -142,20 +131,39 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             }
 
             timer.Stop();
-            NLog.LogManager.GetCurrentClassLogger().Debug($"PlotEvent: {Id} finished in {timer.ElapsedMilliseconds}ms.");
+            NLog.LogManager.GetCurrentClassLogger().Error($"PlotEvent: {Id} finished in {timer.ElapsedMilliseconds}ms.");
 
             if (NextEvents.Count > 0)
             {
-                var tasks = NextEvents
+                /*var tasks = NextEvents
                     .AsParallel()
                     .Where(nextEvent => pass ^ nextEvent.Fail)
                     .Select(nextEvent => nextEvent
                         .PlayNextEvent(instance, new PlotEventInstance(eventInstance), instance.Caster, instance.Target,
                             Effects)
-                    )
-                    .ToArray();
+                    );*/
+                var tasks = new List<Task>();
+                foreach (var nextEvent in NextEvents)
+                {
+                    if (nextEvent.PerTarget)
+                    {
+                        foreach (var unit in eventInstance.EffectedTargets)
+                        {
+                            eventInstance.Target = unit;
+                            if (pass ^ nextEvent.Fail)
+                                tasks.Add(nextEvent.PlayNextEvent(instance, new PlotEventInstance(eventInstance),
+                                    instance.Caster, instance.Target, Effects));
+                        }
+                    }
+                    else
+                    {
+                        if (pass ^ nextEvent.Fail)
+                            tasks.Add(nextEvent.PlayNextEvent(instance, new PlotEventInstance(eventInstance), instance.Caster,
+                                instance.Target, Effects));
+                    }
+                }
 
-                await Task.WhenAll(tasks.ToArray());
+                await Task.WhenAll(tasks);
             }
         }
 

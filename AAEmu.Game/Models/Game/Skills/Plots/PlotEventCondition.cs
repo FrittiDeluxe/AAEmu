@@ -18,7 +18,7 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
                 return true;
 
             if (NotifyFailure)
-                instance.Caster.BroadcastPacket(new SCSkillStoppedPacket(instance.Caster.ObjId, instance.ActiveSkill.Id), true);
+                ;//Maybe do something here?
             
             return false;
 

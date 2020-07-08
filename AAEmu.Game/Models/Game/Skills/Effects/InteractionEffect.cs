@@ -1,5 +1,5 @@
 ﻿using System;
-
+using System.Diagnostics;
 using AAEmu.Game.Models.Game.Char;
 using AAEmu.Game.Models.Game.Skills.Templates;
 using AAEmu.Game.Models.Game.Units;
@@ -18,7 +18,6 @@ namespace AAEmu.Game.Models.Game.Skills.Effects
             CastAction castObj, Skill skill, SkillObject skillObject, DateTime time)
         {
             _log.Debug("InteractionEffect, {0}", WorldInteraction);
-
             var classType = Type.GetType("AAEmu.Game.Models.Game.World.Interactions." + WorldInteraction);
             if (classType == null)
             {

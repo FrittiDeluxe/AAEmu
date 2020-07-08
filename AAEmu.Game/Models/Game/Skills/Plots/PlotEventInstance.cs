@@ -9,6 +9,7 @@ using AAEmu.Game.Models.Game.Units;
 using AAEmu.Game.Models.Game.Skills.Plots.UpdateTargetMethods;
 using AAEmu.Game.Utils;
 using AAEmu.Game.Models.Game.World;
+using System.Diagnostics;
 
 namespace AAEmu.Game.Models.Game.Skills.Plots
 {
@@ -91,7 +92,7 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
         private BaseUnit UpdateAreaTarget(PlotTargetAreaParams args, PlotInstance instance)
         {
             BaseUnit posUnit = new BaseUnit();
-            posUnit.Name = "Dummy";
+            posUnit.ObjId = uint.MaxValue;
             posUnit.Region = PreviousTarget.Region;
             posUnit.Position = new Point();
             posUnit.Position.ZoneId = PreviousTarget.Position.ZoneId;
