@@ -9,8 +9,8 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
     public class PlotEventEffect
     {
         public int Position { get; set; }
-        public int SourceId { get; set; }
-        public int TargetId { get; set; }
+        public PlotEffectSource SourceId { get; set; }
+        public PlotEffectTarget TargetId { get; set; }
         public uint ActualId { get; set; }
         public string ActualType { get; set; }
 
@@ -29,16 +29,16 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             
             switch (SourceId)
             {
-                case 1:
+                case PlotEffectSource.OriginalSource:
                     source = instance.Caster;
                     break;
-                case 2:
+                case PlotEffectSource.OriginalTarget:
                     source = (Unit) instance.Target;
                     break;
-                case 3:
+                case PlotEffectSource.Source:
                     source = (Unit) eventInstance.Source;
                     break;
-                case 4:
+                case PlotEffectSource.Target:
                     source = (Unit) eventInstance.Target;
                     break;
                 default:
@@ -51,19 +51,19 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
                 BaseUnit target;
                 switch (TargetId)
                 {
-                    case 1:
+                    case PlotEffectTarget.OriginalSource:
                         target = instance.Caster;
                         break;
-                    case 2:
+                    case PlotEffectTarget.OriginalTarget:
                         target = instance.Target;
                         break;
-                    case 3:
+                    case PlotEffectTarget.Source:
                         target = eventInstance.Source;
                         break;
-                    case 4:
+                    case PlotEffectTarget.Target:
                         target = newTarget;
                         break;
-                    case 5:
+                    case PlotEffectTarget.Location:
                         target = eventInstance.Target;
                         break;
                     default:
