@@ -4,12 +4,13 @@ using AAEmu.Game.Models.Game.Housing;
 using AAEmu.Game.Models.Game.Units;
 using NLog;
 
-namespace AAEmu.Game.Models.Game.Shipyard
+namespace AAEmu.Game.Models.Game.Shipyards
 {
     public sealed class Shipyard : Unit
     {
         private static Logger _log = LogManager.GetCurrentClassLogger();
 
+        public override UnitTypeFlag TypeFlag { get; } = UnitTypeFlag.Shipyard;
         public ShipyardData Template { get; set; }
         public override UnitCustomModelParams ModelParams { get; set; }
 

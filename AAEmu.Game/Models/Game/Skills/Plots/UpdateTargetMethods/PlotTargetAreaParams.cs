@@ -1,6 +1,6 @@
 ﻿namespace AAEmu.Game.Models.Game.Skills.Plots.UpdateTargetMethods
 {
-    public class PlotTargetAreaParams
+    public class PlotTargetAreaParams : IPlotTargetParams
     {
         public uint AreaShapeId { get; set; } // TODO: Change to AreaShape object
         public int MaxTargets { get; set; }
@@ -9,7 +9,7 @@
         public int MinRange { get; set; }
         public int MaxRange { get; set; }
         public bool HitOnce { get; set; }
-        public int UnitRelationType { get; set; } // TODO: Change to enum
+        public SkillTargetRelation UnitRelationType { get; set; }
         public byte UnitTypeFlag { get; set; }
 
 
@@ -22,7 +22,7 @@
             MinRange = template.TargetUpdateMethodParam5;
             MaxRange = template.TargetUpdateMethodParam6;
             HitOnce = template.TargetUpdateMethodParam7 == 1;
-            UnitRelationType = template.TargetUpdateMethodParam8;
+            UnitRelationType = (SkillTargetRelation)template.TargetUpdateMethodParam8;
             UnitTypeFlag = (byte)template.TargetUpdateMethodParam9;
         }
     }

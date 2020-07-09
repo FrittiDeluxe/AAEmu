@@ -19,6 +19,7 @@ namespace AAEmu.Game.Models.Game.Units
 {
     public class Unit : BaseUnit
     {
+        public virtual UnitTypeFlag TypeFlag { get;} = UnitTypeFlag.None;
         private Task _regenTask;
         public uint ModelId { get; set; }
         public byte Level { get; set; }

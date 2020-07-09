@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace AAEmu.Game.Models.Game.Shipyard
+namespace AAEmu.Game.Models.Game.Shipyards
 {
     public class ShipyardsTemplate
     {

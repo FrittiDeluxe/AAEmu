@@ -15,6 +15,8 @@ namespace AAEmu.Game.Models.Game.NPChar
     {
         private static Logger _log = LogManager.GetCurrentClassLogger();
 
+        public override UnitTypeFlag TypeFlag { get; } = UnitTypeFlag.Npc;
+
         public uint TemplateId { get; set; }
         public NpcTemplate Template { get; set; }
         //public Item[] Equip { get; set; }

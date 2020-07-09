@@ -10,11 +10,18 @@ using AAEmu.Game.Models.Game.Skills.Plots.UpdateTargetMethods;
 using AAEmu.Game.Utils;
 using AAEmu.Game.Models.Game.World;
 using System.Diagnostics;
+using AAEmu.Game.Models.Game.Char;
+using AAEmu.Game.Models.Game.NPChar;
+using AAEmu.Game.Models.Game.Shipyards;
+using NLog;
+using AAEmu.Game.Models.Game.Housing;
 
 namespace AAEmu.Game.Models.Game.Skills.Plots
 {
     public class PlotEventInstance
     {
+        private Logger _log = NLog.LogManager.GetCurrentClassLogger();
+
         public BaseUnit Source { get; set; }
         private BaseUnit PreviousSource { get; set; }
         public BaseUnit Target { get; set; }
@@ -123,7 +130,7 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             
             // posUnit.Position.Z = get heightmap value for x:y     
             //TODO: Get Targets around posUnit?
-            var unitsInRange = FilterTargets(WorldManager.Instance.GetAround<Unit>(posUnit, 5), instance, args.HitOnce);
+            var unitsInRange = FilterTargets(WorldManager.Instance.GetAround<Unit>(posUnit, 5), instance, args);
 
             // TODO : Filter min distance
             // TODO : Compute Unit Relation
@@ -141,7 +148,7 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             //TODO for now we get all units in a 5 meters radius
             var randomUnits = WorldManager.Instance.GetAround<Unit>(Source, 5);
 
-            var filteredUnits = FilterTargets(randomUnits, instance, args.HitOnce);
+            var filteredUnits = FilterTargets(randomUnits, instance, args);
             var index = Rand.Next(0, randomUnits.Count);
             var randomUnit = filteredUnits.ElementAt(index);
 
@@ -157,7 +164,7 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             return posUnit;
         }
 
-        private IEnumerable<Unit> FilterTargets(IEnumerable<Unit> units, PlotInstance instance, bool hitOnce)
+        private IEnumerable<Unit> FilterTargets(IEnumerable<Unit> units, PlotInstance instance, IPlotTargetParams args)
         {
             var template = instance.ActiveSkill.Template;
             var filtered = units;
@@ -165,7 +172,7 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
                 filtered = filtered.Where(o => o.Hp == 0);
             if (!template.TargetDead)
                 filtered = filtered.Where(o => o.Hp > 0);
-            if (hitOnce)
+            if (args.HitOnce)
                 filtered = filtered.Where(o => !instance.HitObjects.Contains(o));
             
             filtered = filtered
@@ -175,7 +182,7 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
                     if (relationState == RelationState.Neutral) // TODO ?
                         return false;
                     
-                    switch (template.TargetRelation)
+                    switch (args.UnitRelationType)
                     {
                         case SkillTargetRelation.Any:
                             return true;
@@ -192,7 +199,8 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
                     }
                 });
 
-            //Todo target unit type
+            filtered = filtered.Where(o => ((byte)o.TypeFlag & args.UnitTypeFlag) != 0);
+
 
             return filtered;
         }

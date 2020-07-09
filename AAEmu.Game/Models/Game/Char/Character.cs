@@ -59,6 +59,7 @@ namespace AAEmu.Game.Models.Game.Char
 
         public List<IDisposable> Subscribers { get; set; }
 
+        public override UnitTypeFlag TypeFlag { get; } = UnitTypeFlag.Character;
         public uint Id { get; set; }
         public uint AccountId { get; set; }
         public Race Race { get; set; }
