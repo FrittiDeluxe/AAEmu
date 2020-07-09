@@ -74,10 +74,14 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             return appliedEffects;
         }
 
-        public async Task PlayEvent(PlotInstance instance, PlotEventInstance eventInstance, PlotNextEvent cNext)
+        public async Task PlayEvent(PlotInstance instance, PlotEventInstance eventInstance, PlotNextEvent cNext, int delay = 0)
         {
             var timer = new Stopwatch();
             timer.Start();
+            
+            if (delay > 0)
+                await Task.Delay(delay, instance.Ct);
+
             byte flag = 2;
 
             if ((instance.Ct.IsCancellationRequested && (cNext?.Casting ?? false)) || instance.Canceled)
@@ -165,13 +169,6 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
 
                 await Task.WhenAll(tasks);
             }
-        }
-
-        public async Task PlayEvent(PlotInstance instance, PlotEventInstance eventInstance, PlotNextEvent cNext,
-            int delay)
-        {
-            await Task.Delay(delay);
-            await PlayEvent(instance, eventInstance, cNext);
         }
     }
 }

@@ -70,7 +70,7 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             else
                 delay += Delay;
             delay = Math.Clamp(delay, 0, int.MaxValue);
-            return delay > 0 ? Event.PlayEvent(instance, eventInstance, this, delay) : Event.PlayEvent(instance, eventInstance, this);
+            return Event.PlayEvent(instance, eventInstance, this, delay);
         }
     }
 }
