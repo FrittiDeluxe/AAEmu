@@ -211,7 +211,7 @@ namespace AAEmu.Game.Core.Managers.World
                         {
                             var shape = new AreaShape();
                             shape.Id = reader.GetUInt32("id");
-                            shape.KindId = reader.GetUInt32("kind_id");
+                            shape.Type = (AreaShapeType)reader.GetUInt32("kind_id");
                             shape.Value1 = reader.GetDouble("value1");
                             shape.Value2 = reader.GetDouble("value2");
                             shape.Value3 = reader.GetDouble("value3");
@@ -629,6 +629,13 @@ namespace AAEmu.Game.Core.Managers.World
         public List<Character> GetAllCharacters()
         {
             return _characters.Values.ToList();
+        }
+
+        public AreaShape GetAreaShapeById(uint id)
+        {
+            if (_areaShapes.TryGetValue(id, out AreaShape res))
+                return res;
+            return null;
         }
     }
 }

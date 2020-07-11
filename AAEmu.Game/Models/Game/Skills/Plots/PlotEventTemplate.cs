@@ -114,7 +114,7 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
                 flag = 0;
 
             double castTime = NextEvents
-                .Where(nextEvent => nextEvent.Casting && (pass ^ nextEvent.Fail))
+                .Where(nextEvent => (nextEvent.Casting || nextEvent.Channeling) && (pass ^ nextEvent.Fail))
                 .Aggregate(0, (current, nextEvent) => (current > nextEvent.Delay) ? current : (nextEvent.Delay / 10));
             castTime = instance.Caster.ApplySkillModifiers(instance.ActiveSkill, SkillAttribute.CastTime, castTime);
             castTime = Math.Clamp(castTime, 0, double.MaxValue);

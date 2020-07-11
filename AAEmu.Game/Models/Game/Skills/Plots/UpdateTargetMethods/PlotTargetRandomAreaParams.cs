@@ -1,8 +1,11 @@
-﻿namespace AAEmu.Game.Models.Game.Skills.Plots.UpdateTargetMethods
+﻿using AAEmu.Game.Core.Managers.World;
+using AAEmu.Game.Models.Game.World;
+
+namespace AAEmu.Game.Models.Game.Skills.Plots.UpdateTargetMethods
 {
     public class PlotTargetRandomAreaParams : IPlotTargetParams
     {
-        public uint AreaShapeId { get; set; } // TODO: Change to AreaShape object
+        public AreaShape Shape { get; set; } // TODO: Change to AreaShape object
         public int MaxTargets { get; set; }
         public int Angle { get; set; }
         public int MinRange { get; set; }
@@ -14,7 +17,7 @@
 
         public PlotTargetRandomAreaParams(PlotEventTemplate template)
         {
-            AreaShapeId = (uint)template.TargetUpdateMethodParam1;
+            Shape = WorldManager.Instance.GetAreaShapeById((uint)template.TargetUpdateMethodParam1);
             MaxTargets = template.TargetUpdateMethodParam2;
             Angle = template.TargetUpdateMethodParam3;
             MinRange = template.TargetUpdateMethodParam4;
