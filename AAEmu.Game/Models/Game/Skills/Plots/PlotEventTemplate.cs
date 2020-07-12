@@ -123,15 +123,21 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             {
                 var skill = instance.ActiveSkill;
                 var unkId = ((cNext?.Casting ?? false) || (cNext?.Channeling ?? false)) ? instance.Caster.ObjId : 0;
-                var casterPlotObj = new PlotObject(eventInstance.Source);
 
-                //Todo Check this a safer way
+                PlotObject casterPlotObj;
+                if (eventInstance.Source.ObjId == uint.MaxValue)
+                    casterPlotObj = new PlotObject(eventInstance.Source.Position);
+                else
+                    casterPlotObj = new PlotObject(eventInstance.Source);
+
                 PlotObject targetPlotObj;
                 if (eventInstance.Target.ObjId == uint.MaxValue)
                     targetPlotObj = new PlotObject(eventInstance.Target.Position);
                 else
                     targetPlotObj = new PlotObject(eventInstance.Target);
-                instance.Caster.BroadcastPacket(new SCPlotEventPacket(skill.TlId, Id, skill.Template.Id, casterPlotObj, targetPlotObj, unkId, (ushort)castTime, flag), true);
+
+                byte targetCount = (byte)eventInstance.EffectedTargets.Count();
+                instance.Caster.BroadcastPacket(new SCPlotEventPacket(skill.TlId, Id, skill.Template.Id, casterPlotObj, targetPlotObj, unkId, (ushort)castTime, flag, 0, targetCount), true);
             }
 
             timer.Stop();
