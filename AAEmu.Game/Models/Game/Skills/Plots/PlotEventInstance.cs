@@ -158,8 +158,48 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
         private BaseUnit UpdateRandomAreaTarget(PlotTargetRandomAreaParams args, PlotInstance instance)
         {
             BaseUnit posUnit = new BaseUnit();
+            posUnit.ObjId = uint.MaxValue;
+            posUnit.Region = PreviousTarget.Region;
+            posUnit.Position = new Point();
+            posUnit.Position.ZoneId = PreviousTarget.Position.ZoneId;
+            posUnit.Position.WorldId = PreviousTarget.Position.WorldId;
 
-            //TODO
+            //TODO Optimize rotation calc 
+            var rotZ = PreviousTarget.Position.RotationZ;
+            int angle = Rand.Next(-180, 180);
+            if (angle != 0)
+                rotZ = MathUtil.ConvertDegreeToDirection(angle + MathUtil.ConvertDirectionToDegree(PreviousTarget.Position.RotationZ));
+
+            float x, y;
+            float distance = Rand.Next(0, (float)args.Distance);
+            if (distance > 0)
+                (x, y) = MathUtil.AddDistanceToFront(distance / 1000, PreviousTarget.Position.X, PreviousTarget.Position.Y, rotZ);
+            else
+                (x, y) = (PreviousTarget.Position.X, PreviousTarget.Position.Y);
+
+            posUnit.Position.X = x;
+            posUnit.Position.Y = y;
+            posUnit.Position.Z = PreviousTarget.Position.Z;
+            posUnit.Position.RotationZ = rotZ;
+            // TODO use heightmap for Z coord 
+
+            if (args.MaxTargets == 0)
+            {
+                EffectedTargets.Add(posUnit);
+                return posUnit;
+            }
+
+            // posUnit.Position.Z = get heightmap value for x:y     
+            //TODO: Get Targets around posUnit?
+            var unitsInRange = FilterTargets(WorldManager.Instance.GetAround<Unit>(posUnit, 5), instance, args);
+
+            // TODO : Filter min distance
+            // TODO : Compute Unit Relation
+            // TODO : Compute Unit Flag
+            // unitsInRange = unitsInRange.Where(u => u.);
+
+            EffectedTargets.AddRange(unitsInRange);
+            instance.HitObjects.AddRange(unitsInRange);
 
             return posUnit;
         }

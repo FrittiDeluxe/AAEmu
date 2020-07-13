@@ -141,7 +141,7 @@ namespace AAEmu.Game.Models.Game.Skills.Plots
             }
 
             timer.Stop();
-            NLog.LogManager.GetCurrentClassLogger().Error($"PlotEvent: {Id} finished in {timer.ElapsedMilliseconds}ms.");
+            NLog.LogManager.GetCurrentClassLogger().Debug($"PlotEvent: {Id} finished in {timer.ElapsedMilliseconds}ms.");
 
             if (NextEvents.Count > 0)
             {
