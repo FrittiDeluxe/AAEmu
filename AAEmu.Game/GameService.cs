@@ -80,6 +80,7 @@ namespace AAEmu.Game
             PortalManager.Instance.Load();
             FriendMananger.Instance.Load();
 
+            ModelManager.Instance.Load();
             NpcManager.Instance.Load();
             DoodadManager.Instance.Load();
             HousingManager.Instance.Load();

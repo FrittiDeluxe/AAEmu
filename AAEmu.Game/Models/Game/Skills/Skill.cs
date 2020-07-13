@@ -350,22 +350,19 @@ namespace AAEmu.Game.Models.Game.Skills
                 buff.Apply(caster, casterCaster, target, targetCaster, new CastSkill(Template.Id, TlId), this, skillObject, DateTime.Now);
             }
 
+            var totalDelay = 0;
             if (Template.EffectDelay > 0)
-            {
-                var totalDelay = Template.EffectDelay;
-                if (Template.UseAnimTime) totalDelay += Template.FireAnim.CombatSyncTime;
+                totalDelay += Template.EffectDelay;
+            if (Template.EffectSpeed > 0)
+                totalDelay += (int) ((caster.GetDistanceTo(target) / Template.EffectSpeed) * 1000.0f);
+            if (Template.FireAnim != null && Template.UseAnimTime)
+                totalDelay += Template.FireAnim.CombatSyncTime;
+            
+            if (totalDelay > 0) 
                 TaskManager.Instance.Schedule(new ApplySkillTask(this, caster, casterCaster, target, targetCaster, skillObject), TimeSpan.FromMilliseconds(totalDelay));
-            }
-            else
-            {
-                var totalDelay = 0;
-                if (Template.UseAnimTime && Template.FireAnim != null)
-                {
-                    totalDelay += Template.FireAnim.CombatSyncTime;
-                    TaskManager.Instance.Schedule(new ApplySkillTask(this, caster, casterCaster, target, targetCaster, skillObject), TimeSpan.FromMilliseconds(totalDelay));
-                }
-                else Apply(caster, casterCaster, target, targetCaster, skillObject);
-            }
+            else 
+                Apply(caster, casterCaster, target, targetCaster, skillObject);
+                
         }
 
         public void Apply(Unit caster, SkillCaster casterCaster, BaseUnit targetSelf, SkillCastTarget targetCaster, SkillObject skillObject)
@@ -379,6 +376,8 @@ namespace AAEmu.Game.Models.Game.Skills
             if (Template.TargetAreaRadius > 0)
             {
                 var obj = WorldManager.Instance.GetAround<BaseUnit>(targetSelf, Template.TargetAreaRadius);
+                // TODO : Need to this if this is needed
+                if (targetSelf is Unit) targets.Add(targetSelf);
                 targets.AddRange(obj);
             }
             else

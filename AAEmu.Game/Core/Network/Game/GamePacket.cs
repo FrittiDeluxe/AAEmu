@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using AAEmu.Commons.Network;
 using AAEmu.Commons.Utils;
@@ -67,10 +68,22 @@ namespace AAEmu.Game.Core.Network.Game
             {
                 //_log.Debug("GamePacket: C->S type {0:X} {2}\n{1}", TypeId, ps, this.ToString().Substring(23));
                 _log.Debug("GamePacket: C->S type {0:X3} {1}", TypeId, this.ToString().Substring(23));
+
             }
             try
             {
+#if DEBUG
+                var sw = new Stopwatch();
+                sw.Start();
+#endif
                 Read(ps);
+#if DEBUG
+                sw.Stop();
+                if (!(TypeId == 0x012 && Level == 2) && // Ping
+                    !(TypeId == 0x015 && Level == 2) && // FastPing
+                    !(TypeId == 0x089 && Level == 1))
+                    _log.Trace("Packet {0} took {1}ms to process", ToString().Substring(23), sw.ElapsedMilliseconds);
+#endif
             }
             catch (Exception ex)
             {
